@@ -1,35 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// import JSON file "as it is" without defining a constant or export to avoid TypeScript Error
+import scenes from "./data/scenes.json";
+import { Escena } from "./components/Escena";
+import { Header } from "./components/Header";
+import { useState } from "react";
+import { Welcome } from "./components/Welcome";
+import { Background } from "./components/Background";
 
 function App() {
-  const [count, setCount] = useState(0)
+  // define the state of Welcome component
+  const [firstPage, setPage] = useState(true);
+  const [level, setLevel] = useState(1);
+  const [background, setBackground] = useState(`img/1.jpg`);
 
-  return (
+  // define a function that will be used by the right button
+  const GoAhead = () => {
+    if (level < scenes.length) {
+      setLevel(level + 1);
+      setBackground(`img/${level + 1}.jpg`);
+    }
+    if (level >= scenes.length) {
+      setLevel(1);
+      setBackground(`img/1.jpg`);
+    }
+  };
+  // define a function that will be used by the left button
+  const GoBack = () => {
+    if (level <= scenes.length) {
+      setLevel(level - 1);
+      setBackground(`img/${level - 1}.jpg`);
+    }
+
+    if (level === 1) {
+      setLevel(4);
+      setBackground(`img/4.jpg`);
+    }
+  };
+
+  // define a function to set the change of state
+  const GoPage = () => {
+    setPage(false);
+  };
+
+  // return a conditional ternary to hide or show the nextpage
+  return firstPage === true ? (
+    <Welcome next={GoPage} />
+  ) : (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Background imgurl={background}>
+        <Header back={GoBack} ahead={GoAhead} />
+        {scenes.map((item) => (
+          <Escena key={item.id} id={item.id} text={item.escena} level={level} />
+        ))}
+      </Background>
     </>
-  )
+  );
 }
-
-export default App
+export default App;
